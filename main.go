@@ -10,7 +10,7 @@ import (
 type article struct {
 	ID        int `json:"id"`
 	Name      string `json:"name"`
-	CreatedAt time.Time
+	CreatedAt time.Time `json:"created_at"`
 }
 
 var articles = []article{
@@ -33,6 +33,7 @@ func main() {
 	echoApp.GET("/articles",getArticleController)
 	echoApp.GET("/article",getArticleByQueryController)
 	echoApp.POST("/article",createArticleController)
+	echoApp.POST("/article2",createArticleController2)
 	echoApp.GET("/article/:id",getArticleByIdController)
 
 	echoApp.Start(":8080")
@@ -54,6 +55,7 @@ func getArticleByQueryController(ctx echo.Context) error{
 	return ctx.JSON(http.StatusOK,articles[id-1])
 }
 
+//with form value
 func createArticleController(ctx echo.Context)error{
 	var newArticle article
 
@@ -63,6 +65,20 @@ func createArticleController(ctx echo.Context)error{
 	newArticle.ID = formID
 	newArticle.Name = formName
 	newArticle.CreatedAt = time.Now()
+
+	articles = append(articles,newArticle)
+
+	return ctx.JSON(http.StatusOK,map[string]interface{}{
+		"message": "succes create article",
+		"data": newArticle,
+	})
+}
+
+//with binding
+func createArticleController2(ctx echo.Context)error{
+	newArticle := article{}
+
+	ctx.Bind(&newArticle)
 
 	articles = append(articles,newArticle)
 
